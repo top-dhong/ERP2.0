@@ -1,0 +1,107 @@
+@import '~@/assets/style/unit/color.scss';
+
+// 工具类名统一前缀
+$prefix: d2;
+
+// 禁止用户选中 鼠标变为手形
+%unable-select {
+  user-select: none;
+  cursor: pointer;
+}
+
+// 填满父元素
+// 组要父元素 position: relative | absolute;
+%full {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+}
+
+// flex 垂直水平居中
+%flex-center-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+%flex-center-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+// 将元素模拟成卡片外观
+%card {
+  border: 1px solid #dddee1;
+  border-color: #e9eaec;
+  background: #fff;
+  border-radius: 4px;
+  font-size: 14px;
+  position: relative;
+}
+
+
+//以下是全局自定义样式===========↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+//自定义三组按钮样式
+.btn-mya{
+		color: #fff;
+		background-color: #8B83D2;
+		border-color: #8B83D2;
+	}
+.btn-mya:hover{
+	background-color: #9390f0;
+	border-color: #8B83D2;
+	color:#fff;
+}
+.btn-mya:focus{
+	background-color: #8B83D2;
+	border-color: #8B83D2;
+}
+
+.btn-myb{
+	color: #fff;
+	background-color: #55557f;
+	border-color: #55557f;
+}
+.btn-myb:hover{
+	background-color: #62667f;
+	border-color: #55557f;
+	color:#fff;
+}
+.btn-myb:focus{
+	background-color: #55557f;
+	border-color: #55557f;
+}
+
+.btn-myc{
+	color: #fff;
+	background-color: #ff9d47;
+	border-color: #ff9d47;
+}
+.btn-myc:hover{
+	background-color: #e58d40;
+	border-color: #ff9d47;
+	color:#fff;
+}
+.btn-myc:focus{
+	background-color: #ff9d47;
+	border-color: #ff9d47;
+}
+
+
+.el-radio__input.is-checked + .el-radio__label {
+  color: #fd7624 !important;
+}
+.el-radio__input.is-checked .el-radio__inner {
+  background: #fd7624 !important;
+  border-color: #fd7624 !important;
+}
+.el-input.is-disabled .el-input__inner {
+    background-color: #F5F7FA;
+    border-color: #E4E7ED;
+    color: #606266;
+    cursor: not-allowed;
+}

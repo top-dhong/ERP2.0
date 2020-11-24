@@ -1,0 +1,453 @@
+<!-- page 请备注表单名称 -->
+<template>
+  <d2-container>
+    <div ref="printDom1">
+      <el-row>
+        <el-alert v-if="!FlowTypeGUID&&!Flg" title="数据加载出错,请勿刷新页面,请关闭当前页面后重新打开" type="error" :closable="false" center show-icon />
+      </el-row>
+      <el-row>
+        <el-col :span="24">
+          <el-form :model="flowData" ref="flowData" label-position="left" label-width="110px" class="demo-ruleForm" size="mini">
+            <!-- 加载流程基本数据模块 -->
+            <page-flow-head :flow-data="flowData" :Flg="Flg"></page-flow-head>
+            <!-- 核心内容  "hrs": "", "text1": "", "text3": "", "text4": "", "text5": "", "memo": "" -->
+            <el-row style="margin-bottom: 18px">
+              <el-col>
+                <span><b><i class="el-icon-camera"></i>核心内容</b></span>
+              </el-col>
+            </el-row>
+            <el-row>
+			<el-col :span="12">
+			  <el-form-item label="计划名称：" class="te-item" prop="flowCoreData.text1" :rules="[{ required: true, message: '计划名称不能为空',trigger:'blur'}]">
+				<el-input placeholder="计划名称" v-model="flowData.flowCoreData.text1" :maxlength="45" autocomplete="off" :readonly="(Flg=='VIEW')" clearable></el-input>
+			  </el-form-item>
+			</el-col>
+			<el-col :span="12">
+			  <el-form-item label="计划等级：" class="te-item" prop="flowCoreData.text3" :rules="[{ required: true, message: '计划等级',trigger:'blur'}]">
+				<el-input placeholder="计划等级" v-model="flowData.flowCoreData.text3" :maxlength="45" autocomplete="off" :readonly="(Flg=='VIEW')" clearable></el-input>
+			  </el-form-item>
+			</el-col>
+            </el-row>
+            <el-row>
+			  <el-col :span="8">
+				<el-form-item label="负责人：" class="te-item" prop="flowCoreData.text4" :rules="[{ required: true, message: '负责人不能为空',trigger:'blur'}]">
+				  <deng-select-user :value="flowData.flowCoreData.text4_V" :CYUserSelectValue="flowData.flowCoreData.CYUserSelectValue_text4||[]" @submitdata="sethrs($event,'text4')" :readonly="(Flg=='VIEW')"/>
+				</el-form-item>
+			  </el-col>
+			  <el-col :span="8">
+			    <el-form-item label="风险点：" class="te-item" prop="flowCoreData.text5" :rules="[{ required: true, message: '风险点',trigger:'blur'}]">
+			  	<el-input placeholder="风险点" v-model="flowData.flowCoreData.text5" :maxlength="45" autocomplete="off" :readonly="(Flg=='VIEW')" clearable></el-input>
+			    </el-form-item>
+			  </el-col>
+			  <el-col :span="8">
+			    <el-form-item label="停止点：" class="te-item" prop="flowCoreData.text7" :rules="[{ required: true, message: '停止点',trigger:'blur'}]">
+			  	<el-input placeholder="停止点" v-model="flowData.flowCoreData.text7" :maxlength="45" autocomplete="off" :readonly="(Flg=='VIEW')" clearable></el-input>
+			    </el-form-item>
+			  </el-col>
+            </el-row>
+            <el-row>
+           <el-col :span="12">
+             <el-form-item label="计划日期：" class="te-item" prop="flowCoreData.text8" :rules="[{ required: true, message: '计划日期',trigger:'blur'}]">
+               <el-date-picker style="width:100%;" v-model="flowData.flowCoreData.text8" :readonly="(Flg=='VIEW')" type="date" placeholder="请选择"/>
+             </el-form-item>
+           </el-col>
+              <el-col :span="12">
+                <el-form-item label="申请类型：" class="te-item" prop="flowCoreData.text10" :rules="[{ required: true, message: '申请类型选择',trigger:'blur'}]">
+                  <el-radio-group v-model="flowData.flowCoreData.text10" :disabled="(Flg=='VIEW')">
+                    <el-radio label="取消计划"></el-radio>
+                    <el-radio label="调整时间"></el-radio>
+                    <el-radio label="进度反馈"></el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+				  <el-col :span="12">
+				  <el-form-item label="调整完成日期：" class="te-item" prop="flowCoreData.date2" :rules="[{ required: true, message: '调整后完成日期',trigger:'blur'}]">
+					<el-date-picker style="width:100%;" v-model="flowData.flowCoreData.date2" :readonly="(Flg=='VIEW')" type="date" placeholder="请选择"/>
+				  </el-form-item>
+				  </el-col>
+				 <el-col :span="12">
+				   <el-form-item label="计划影响：" class="te-item" prop="flowCoreData.text13" :rules="[{ required: true, message: '选择',trigger:'blur'}]">
+				     <el-radio-group v-model="flowData.flowCoreData.text13" :disabled="(Flg=='VIEW')">
+				       <el-radio label="影响其他计划延期"></el-radio>
+				       <el-radio label="无影响 "></el-radio>
+				     </el-radio-group>
+				   </el-form-item>
+				 </el-col> 
+            </el-row>
+			  <el-row>
+				  <el-col :span="24">
+				    <el-form-item label="调整原因：" class="te-item" prop="flowCoreData.memo" :rules="[{ required: true, message: '调整原因不能为空',trigger:'blur'}]">
+				      <el-input type="textarea" :autosize="{ minRows: 6}" v-model="flowData.flowCoreData.memo" placeholder="请输入调整原因..." :readonly="(Flg=='VIEW')" clearable></el-input>
+				    </el-form-item>
+				  </el-col>
+			 </el-row>
+            <!-- 加载流程其它数据模块 -->
+            <page-flow-foot :flow-data="flowData" :Flg="Flg"></page-flow-foot>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+    <template slot="footer">
+      <!-- 按钮组   聚合(text/点击事件/加载状态/显示状态/typeORclass/iconName) -->
+      <page-but-group 
+		:pops="butgroup" 
+		:flowData="flowData" 
+		:popRef="$refs.flowData" 
+		:FlowGUID="FlowGUID" 
+		:tagName="tagName"
+		:Flg="Flg"
+		@showThreeModal="showThreeModal" 
+		@showFlowRebut="showFlowRebut" 
+		@showPrint="showPrint"
+		@showRea="showRea"
+		@showMoney="showMoney"
+	  />
+    </template>
+    <!-- 驳回弹窗 -->
+    <page-dialog-rebut :pops="modalRebut" :FlowGUID="FlowGUID" :tagName="tagName"/>
+    <!-- 合并 三个 转办/传阅/沟通-->
+    <page-dialog-three :pops="modal" :flowData="flowData" :tagName="tagName"/>
+    <!-- 打印弹窗 -->
+	<page-dialog-print :pops="modalPrint" :flowData="flowData" :printRef="$refs.printDom1"/>
+    <!-- 实际付款 -->
+	<page-dialog-rea :pops="modalRea" :FlowGUID="FlowGUID" :flowData="flowData"/>
+    <!-- 资金登记 -->
+	<page-dialog-money :pops="modalMoney" :FlowGUID="FlowGUID" :flowData="flowData"/>
+  </d2-container>
+</template>
+<script>
+//http://www.mtsoftware.cn/download.html
+import util from '@/libs/util.js';
+import qs from "qs";
+import myMixin from './js/public.js';
+import { mapActions } from "vuex";
+import { InitFlowInfo, OpenFlow } from "@/api/flow/flow";
+export default {
+	//https://github.com/dream2023/ele-table-editor
+  name: "flow-flowaddpush-WFProjPlanChangeTemp1",
+  mixins: [myMixin],
+  components: {
+    'pageFlowHead': () => import(`./componnets/pageHeader`),
+    'pageFlowFoot': () => import(`./componnets/pageFooter`),
+    'dengSelectUser': () => import(`@cps/deng-select-user`),
+    'pageDialogRebut': () => import(`./componnets/pageDialogRebut`),
+	'pageDialogThree': () => import(`./componnets/pageDialogThree`),
+	'pageDialogPrint': () => import(`./componnets/pageDialogPrint`),
+	'pageDialogRea': () => import(`./componnets/pageDialogRea`),
+	'pageDialogMoney': () => import(`./componnets/pageDialogMoney`),
+	'pageButGroup': () => import(`./componnets/pageButGroup`)
+  },
+  data() {
+    return {
+		tagName:"",
+		FlowTypeGUID: "",//页面暂存  提交数据使用
+		FlowGUID: "",//流程ID
+		Flg: "",//""新建  "EDT"编辑  "VIEW"明细
+		flowTypeName: "",
+		flowData: {
+			flowBaseData: {},
+			flowCoreData: { CYUserSelectValue_hrs: [], hrs_V: "" },
+			relaFlowObj: [],
+			annexData: [],
+			agree: "同意",
+			opinionData: "",
+			printChk: ["打印表单", "打印流转意见"]
+		},
+		//按钮组
+		butgroup:[
+			{
+				text:"暂存",
+				tapAction:"submit",//点击按钮触发事件
+				actionPar:{doType:"暂存"},//点击按钮带的参数
+				loading:false,
+				isShow:true,
+				type:"primary",//type和class至少设值一个
+				class:"",
+				iconName:"floppy-o"
+			},
+			{
+				text:"提交",
+				tapAction:"submit",//点击按钮触发事件
+				actionPar:{doType:"提交"},//点击按钮带的参数
+				loading:false,
+				isShow:true,
+				type:"success",//type和class至少设值一个
+				class:"",
+				iconName:"check-square-o"
+			},
+			{
+				text:"传阅",
+				tapAction:"showThreeModal",//点击按钮触发事件
+				actionPar:{
+					modal:{
+							title:"传阅流程",
+							canMark:"more",
+							dialogVisible:true,
+							tapOK:"tapFlowCirculate"
+						}
+					},//点击按钮带的参数
+				loading:false,
+				isShow:true,
+				type:"info",//type和class至少设值一个
+				class:"",
+				iconName:"envelope-o"
+			},
+			{
+				text:"收回",
+				tapAction:"tapFlowRetake",//点击按钮触发事件
+				actionPar:{},//点击按钮带的参数
+				loading:false,
+				isShow:true,
+				type:"",//type和class至少设值一个
+				class:"btn-myc",
+				iconName:"download"
+			},
+			{
+				text:"沟通",
+				tapAction:"showThreeModal",//点击按钮触发事件
+				actionPar:{
+					modal:{
+							title:"沟通流程",
+							canMark:"more",
+							dialogVisible:true,
+							tapOK:"tapFlowConsult"
+						}
+					},//点击按钮带的参数
+				loading:false,
+				isShow:true,
+				type:"warning",//type和class至少设值一个
+				class:"",
+				iconName:"commenting-o"
+			},
+			{
+				text:"转办",
+				tapAction:"showThreeModal",//点击按钮触发事件
+				actionPar:{
+					modal:{
+							title:"转办流程",
+							canMark:"one",
+							dialogVisible:true,
+							tapOK:"tapFlowTurnDo"
+						}
+					},//点击按钮带的参数
+				loading:false,
+				isShow:true,
+				type:"",//type和class至少设值一个
+				class:"btn-mya",
+				iconName:"envelope-open-o"
+			},
+			{
+				text:"驳回",
+				tapAction:"showFlowRebut",//点击按钮触发事件
+				actionPar:{},//点击按钮带的参数
+				loading:false,
+				isShow:true,
+				type:"",//type和class至少设值一个
+				class:"btn-myd",
+				iconName:"comment-o"
+			},
+			{
+				text:"打印",
+				tapAction:"showPrint",//点击按钮触发事件
+				actionPar:{},//点击按钮带的参数
+				loading:false,
+				isShow:true,
+				type:"danger",//type和class至少设值一个
+				class:"",
+				iconName:"print"
+			},
+			{
+				text:"实际付款",
+				tapAction:"showRea",//点击按钮触发事件
+				actionPar:{},//点击按钮带的参数
+				loading:false,
+				isShow:true,
+				type:"",//type和class至少设值一个
+				class:"btn-mya",
+				iconName:"credit-card"
+			},
+			{
+				text:"资金登记",
+				tapAction:"showMoney",//点击按钮触发事件
+				actionPar:{},//点击按钮带的参数
+				loading:false,
+				isShow:true,
+				type:"",//type和class至少设值一个
+				class:"btn-myb",
+				iconName:"pencil-square-o"
+			}
+		],
+		//驳回弹窗
+		modalRebut:{
+			title:"",
+			CYUserSelectValue: [],
+			dialogVisible: false,
+			btnLoading:false
+		},
+		//合并弹窗 转办/传阅/沟通
+		modal: {
+			title: "",
+			CYUserSelectValue: [],
+			canMark: "more",
+			dialogVisible: false,
+			btnLoading: false,
+			tapOK: ""
+		},
+		//打印相关参数
+		modalPrint:{
+			dialogVisible: false
+		},
+		//实际付款
+		modalRea:{
+			dialogVisible: false,
+			btnLoading: false
+		},
+		//资金登记
+		modalMoney:{
+			dialogVisible: false,
+			btnLoading: false
+		}
+	};
+  },
+  created() {
+    let that = this
+	that.tagName = 'flow-'+that.$vnode.tag.split('-flow-')[1]
+    that.FlowTypeGUID = that.$route.query.GUID;
+    that.flowTypeName = that.$route.query.name;
+    that.FlowGUID = that.$route.query.FlowGUID;
+    that.Flg = that.$route.query.Flg || ""
+    if (that.Flg) {
+      if ("EDT" == that.Flg||"VIEW" == that.Flg) {
+        //初始化页面数据
+        that.OpenFlow({ FlowGUID: that.FlowGUID }).then((res) => {
+          that.flowData.flowBaseData = util.assignObj(that.flowData.flowBaseData, res.data.flowBaseData);
+          that.flowData.flowCoreData = util.assignObj(that.flowData.flowCoreData, res.data.flowCoreData);
+          that.flowData.flowTabsData = util.assignObj(that.flowData.flowTabsData, res.data.flowTabsData);
+          that.flowData.annexData = res.data.annexData||[];
+          that.flowData.relaFlowObj = res.data.relaFlowObj||[];
+          that.flowData.hisOpinionData = res.data.hisOpinionData||[];
+          that.flowData.flowBaseData = util.doCoreObj(that.flowData.flowBaseData,that.flowData.flowBaseData);
+          that.flowData.flowCoreData = util.doCoreObj(that.flowData.flowCoreData,that.flowData.flowCoreData);
+        });
+      }
+    } else {
+      //初始化页面新建模板数据
+      that.initData({ FlowTypeGUID: that.FlowTypeGUID }).then((res) => {
+        that.flowData.flowBaseData = util.assignObj(that.flowData.flowBaseData, res.data.flowBaseData);
+        that.flowData.flowCoreData = util.assignObj(that.flowData.flowCoreData, res.data.flowCoreData);
+        that.flowData.flowBaseData = util.doCoreObj(that.flowData.flowBaseData,that.flowData.flowBaseData);
+        that.flowData.flowCoreData = util.doCoreObj(that.flowData.flowCoreData,that.flowData.flowCoreData);
+      });
+    }
+
+    console.log('FlowTypeGUID:', that.FlowTypeGUID)
+    //禁用f5
+    that.stopF5Refresh()
+    //禁用浏览器刷新
+    //window.addEventListener('beforeunload', e => that.beforeunloadHandler(e))
+  },
+  methods: {
+    ...mapActions("d2admin/flow", ["initData", "OpenFlow"]),
+    test() {
+      this.$message({ message: `敬请期待！`, type: 'info' })
+    },
+    //如果包含其它打印项(如附件) 弹出选择打印
+    showPrint() {
+      this.modalPrint.dialogVisible = true
+    },
+    //导出选取的人员信息
+    //后台要的数据结构 '@123=小明,234=小红'  如果为空则为@
+    sethrs(users,HRMark) {
+		let that = this
+		console.log('users=>', users)
+		let tmpArr = users.map((item) => { return `${item.GUID}=${item.UserName}` })
+		that.flowData.flowCoreData[`${HRMark}`] = '@' + tmpArr.join(',');
+		that.flowData.flowCoreData[`CYUserSelectValue_${HRMark}`] = users;
+    },
+	//转办/传阅/沟通 弹窗显示
+	showThreeModal(modal){
+		let that = this
+		console.log(111,modal)
+		let Subject = that.flowData.flowBaseData.Subject
+		//let title = modal.title+`[${Subject}]`
+		that.modal = modal
+		//that.modal.title = title;
+		that.modal.dialogVisible = true
+	},
+    //弹出驳回弹窗
+    showFlowRebut() {
+      let that = this
+	  let Subject = that.flowData.flowBaseData.Subject
+	  that.modalRebut.title = `驳回流程[${Subject}]`;
+	  that.modalRebut.dialogVisible = true
+	  that.modalRebut.btnLoading = false
+    },
+    //实际付款弹窗
+    showRea() {
+      this.modalRea.dialogVisible = true
+    },
+    showMoney() {
+      this.modalMoney.dialogVisible = true
+    }
+  }
+}
+</script>
+<style>
+.te-item {
+  margin-left: 0.9375rem;
+}
+.btn-mya {
+  color: #fff;
+  background-color: #8b83d2;
+  border-color: #8b83d2;
+}
+.btn-mya:hover {
+  background-color: #9390f0;
+  border-color: #8b83d2;
+  color: #fff;
+}
+.btn-mya:focus {
+  background-color: #8b83d2;
+  border-color: #8b83d2;
+}
+
+.btn-myb {
+  color: #fff;
+  background-color: #55557f;
+  border-color: #55557f;
+}
+.btn-myb:hover {
+  background-color: #62667f;
+  border-color: #55557f;
+  color: #fff;
+}
+.btn-myb:focus {
+  background-color: #55557f;
+  border-color: #55557f;
+}
+
+.btn-myd {
+  color: #fff;
+  background-color: #27003b;
+  border-color: #27003b;
+}
+.btn-myd:hover {
+  background-color: #3b0131;
+  border-color: #27003b;
+  color: #fff;
+}
+.btn-myd:focus {
+  background-color: #27003b;
+  border-color: #27003b;
+}
+</style>
+
+<style media='print'>
+@page {
+  size: auto;
+  margin: 5mm 5mm 2mm 5mm;
+}
+</style>
+
